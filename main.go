@@ -16,7 +16,7 @@ func main() {
 		if router := r.Match(request); router != nil {
 			exchange := gateway.BuildServerWebExchange(request)
 			router.FilterBefore(exchange)
-			fmt.Println(request.URL.Path)
+			fmt.Println(request.Header)
 			remote, err := url.Parse(router.Url)
 			if err != nil {
 				fmt.Println(err)
@@ -28,6 +28,7 @@ func main() {
 			writer.WriteHeader(http.StatusBadRequest)
 		}
 	})
-
-	http.ListenAndServe(":8081", nil)
+	if err := http.ListenAndServe(":8081", nil); err != nil {
+		fmt.Println(err)
+	}
 }

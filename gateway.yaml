@@ -1,0 +1,18 @@
+routes:
+  -  id: course1
+     url: http://localhost:8080
+     Predicates:
+       path: /v1/a/*
+       header: X-Id,^\d+$
+       method: GET,POST
+     Filters:
+       - StripPrefix=2
+       - SetHeader=Name,shenyi,age,19
+       - id: 101
+         name: abc
+
+  -  id: course2
+     url: http://localhost:9000
+     Predicates:
+       path: /v2/
+
