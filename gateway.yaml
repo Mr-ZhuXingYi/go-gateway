@@ -8,6 +8,7 @@ routes:
      Filters:
        - StripPrefix=2
        - SetHeader=Name,shenyi,age,19
+       - Test=1
        - id: 101
          name: abc
 
@@ -15,4 +16,3 @@ routes:
      url: http://localhost:9000
      Predicates:
        path: /v2/
-

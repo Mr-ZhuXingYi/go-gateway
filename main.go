@@ -21,7 +21,6 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-
 			p := httputil.NewSingleHostReverseProxy(remote)
 			p.ServeHTTP(writer, request)
 		} else {
