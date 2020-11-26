@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path"
+	"strings"
 )
 
 func init() {
@@ -26,30 +27,36 @@ type FilterPlugin struct {
 	Main otto.Value
 }
 
-func (self *FilterPlugin) Filter(exchange *ServerWebExchange) {
+func (self *FilterPlugin) Filter(params ...interface{}) {
 	this, _ := otto.ToValue(nil)
-	_, err := self.Main.Call(this, exchange) //调用 闭包 ,传递上下文参数
+	_, err := self.Main.Call(this, params...) //调用 闭包 ,传递上下文参数
 	if err != nil {
-		log.Println(err)
+		log.Println("self.Main.Call(this, params):", err)
 	}
 }
 func (self *FilterPlugin) Apply(config interface{}) GatewayFilter {
 	return func(exchange *ServerWebExchange) {
-		self.Filter(exchange)
+		slis := strings.Split(config.(string), ",")
+		params := make([]interface{}, 0)
+		params = append(params, exchange)
+		for _, s := range slis {
+			params = append(params, s)
+		}
+		self.Filter(params...)
 	}
 }
 func loadPlugin(js *otto.Otto) *FilterPlugin {
 	filter_name, err := js.Call("name", nil)
 	if err != nil {
-		log.Println(err)
+		log.Println("err := js.Call(\"name\", nil):", err)
 		return nil
 	}
 	filter_main, err := js.Call("main", nil)
 	if err != nil || !filter_main.IsFunction() {
-		log.Println(err)
+		log.Println("js.Call(\"main\", nil):", err)
 		return nil
 	}
-	log.Println(filter_name.ToString())
+	//log.Println(filter_name.ToString())
 	return &FilterPlugin{Name: filter_name.String(), Main: filter_main}
 }
 func loadPlugins(dirname string) []*FilterPlugin {
@@ -60,7 +67,7 @@ func loadPlugins(dirname string) []*FilterPlugin {
 			js := otto.New()
 			_, err := js.Run(readFile(dirname + "/" + file.Name()))
 			if err != nil {
-				log.Println(err)
+				log.Println("js.Run:", err)
 				continue
 			}
 			if p := loadPlugin(js); p != nil {

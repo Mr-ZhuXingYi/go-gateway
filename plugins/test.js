@@ -1,10 +1,11 @@
 
 
 function main() {
-   return function (exchange) {
-       exchange.Request.Header.Set("gf","wy1111111111")
+   return function (exchange,key,value) {
+       exchange.Request.Header.Set(key,value)
    }
 }
+
 function name() {
      return 'Test'
 }
