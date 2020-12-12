@@ -12,7 +12,7 @@ func init() {
 	RegisterFilter("StripPrefix", NewStripPrefixFilter())
 }
 func (this *StripPrefixFilter) Apply(config interface{}) GatewayFilter {
-	return func(exchange *ServerWebExchange) {
+	return func(exchange *ServerWebExchange) ResponseFilter {
 		path := exchange.Request.URL.Path
 		//   /v1/course  ==>  [ v1 course]
 
@@ -27,8 +27,15 @@ func (this *StripPrefixFilter) Apply(config interface{}) GatewayFilter {
 		}
 		path_list := strings.Split(path, "/")
 		exchange.Request.URL.Path = strings.Join(path_list[defIndex+1:], "/")
+
+		return nil
 	}
 }
+
+func (this *StripPrefixFilter) GetOrder() int {
+	return 3
+}
+
 func NewStripPrefixFilter() *StripPrefixFilter {
 	return &StripPrefixFilter{}
 }

@@ -3,11 +3,12 @@ routes:
      url: http://localhost:8080
      Predicates:
        path: /v1/a/*
-       header: X-Id,^\d+$
+#       header: X-Id,^\d+$
        method: GET,POST
      Filters:
        - StripPrefix=2
        - SetHeader=Name,shenyi,age,19
+       - AddQuery=from,zxy
        - Test=gf,wy1111111
        - id: 101
          name: abc

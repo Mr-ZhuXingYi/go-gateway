@@ -15,10 +15,11 @@ type Predicates struct {
 type Filter struct {
 }
 type Route struct {
-	Id         string
-	Url        string
-	Predicates Predicates
-	Filters    []interface{}
+	Id           string
+	Url          string
+	Predicates   Predicates
+	Filters      []interface{}
+	orderFilters []interface{} //排序过后的 过滤器集合
 }
 
 type Routes []*Route
@@ -41,7 +42,6 @@ func (this Routes) isMatch(r *Route, request *http.Request) bool {
 			}
 		}
 	}
-
 	return true
 
 }

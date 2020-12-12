@@ -23,8 +23,9 @@ func readFile(file string) string {
 }
 
 type FilterPlugin struct {
-	Name string
-	Main otto.Value
+	Name  string
+	Main  otto.Value
+	Order int
 }
 
 func (self *FilterPlugin) Filter(params ...interface{}) {
@@ -35,7 +36,7 @@ func (self *FilterPlugin) Filter(params ...interface{}) {
 	}
 }
 func (self *FilterPlugin) Apply(config interface{}) GatewayFilter {
-	return func(exchange *ServerWebExchange) {
+	return func(exchange *ServerWebExchange) ResponseFilter {
 		slis := strings.Split(config.(string), ",")
 		params := make([]interface{}, 0)
 		params = append(params, exchange)
@@ -43,8 +44,14 @@ func (self *FilterPlugin) Apply(config interface{}) GatewayFilter {
 			params = append(params, s)
 		}
 		self.Filter(params...)
+		return nil
 	}
 }
+
+func (self *FilterPlugin) GetOrder() int {
+	return self.Order
+}
+
 func loadPlugin(js *otto.Otto) *FilterPlugin {
 	filter_name, err := js.Call("name", nil)
 	if err != nil {
@@ -56,8 +63,16 @@ func loadPlugin(js *otto.Otto) *FilterPlugin {
 		log.Println("js.Call(\"main\", nil):", err)
 		return nil
 	}
+
+	filter_order, err := js.Call("order", nil)
+	if !filter_order.IsNumber() || err != nil {
+		return nil
+	}
+
+	order, _ := filter_order.ToInteger()
+
 	//log.Println(filter_name.ToString())
-	return &FilterPlugin{Name: filter_name.String(), Main: filter_main}
+	return &FilterPlugin{Name: filter_name.String(), Main: filter_main, Order: int(order)}
 }
 func loadPlugins(dirname string) []*FilterPlugin {
 	ret := make([]*FilterPlugin, 0)

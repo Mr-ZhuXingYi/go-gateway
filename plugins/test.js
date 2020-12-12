@@ -1,11 +1,14 @@
-
-
 function main() {
-   return function (exchange,key,value) {
-       exchange.Request.Header.Set(key,value)
-   }
+    return function (exchange, key, value) {
+        exchange.Request.Header.Set(key, value)
+    }
 }
 
 function name() {
-     return 'Test'
+    return 'Test'
+}
+
+
+function order() {
+    return -1
 }
